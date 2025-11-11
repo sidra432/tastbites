@@ -1,0 +1,23 @@
+.text-orange {
+  color: #ff7b00;
+}
+
+.text-grey {
+  color: #555;
+}
+
+.menu-card {
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.menu-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(255, 123, 0, 0.3);
+}
+
+.menu-img {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+}
