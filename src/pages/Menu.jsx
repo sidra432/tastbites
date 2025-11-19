@@ -234,7 +234,7 @@ const Menu = () => {
               <p style={{ color: "#ff7b00", fontWeight: "bold" }}>
                 Rs. {item.price} PKR
               </p>
-              <Link to="/reservation" className="order-btn">
+              <Link to="/contact" className="order-btn">
                 Order Now
               </Link>
             </div>

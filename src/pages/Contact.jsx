@@ -1,111 +1,275 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
 
 const Contact = () => {
-  const { register, handleSubmit, reset } = useForm();
+  const [order, setOrder] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
 
-  const onSubmit = (data) => {
-    alert(`Message Sent!\nName: ${data.name}\nEmail: ${data.email}\nMessage: ${data.message}`);
-    reset();
+  const [selectedItems, setSelectedItems] = useState([{ dish: "", quantity: 1 }]);
+  const [bill, setBill] = useState(null);
+  const [thankYou, setThankYou] = useState(false); // new state for thank-you message
+
+  const menuItems = {
+    "Chicken Biryani": 1200,
+    "Beef Burger": 950,
+    "Pasta Alfredo": 1100,
+    "Chocolate Cake": 600,
+    "Pizza": 1500,
+    "Grilled Sandwich": 700,
+    "Mutton Karahi": 1800,
+    "Zinger Burger": 850,
+    "Fried Rice": 950,
+    "Club Sandwich": 650,
+    "French Fries": 400,
+    "Cold Coffee": 450,
+    "Strawberry Shake": 500,
+    "Tandoori Chicken": 1700,
+    "Cheese Naan": 250,
   };
 
+  const handleDishChange = (index, field, value) => {
+    const updated = [...selectedItems];
+    updated[index][field] = field === "quantity" ? parseInt(value) : value;
+    setSelectedItems(updated);
+  };
+
+  const addDish = () => {
+    setSelectedItems([...selectedItems, { dish: "", quantity: 1 }]);
+  };
+
+  const removeDish = (index) => {
+    setSelectedItems(selectedItems.filter((_, i) => i !== index));
+  };
+
+  const calculateBill = (e) => {
+    e.preventDefault();
+
+    let total = 0;
+    const items = selectedItems.map((item) => {
+      const price = menuItems[item.dish] || 0;
+      const itemTotal = price * item.quantity;
+      total += itemTotal;
+      return { ...item, price, itemTotal };
+    });
+
+    setBill({
+      ...order,
+      items,
+      total,
+      date: new Date().toLocaleString(),
+      orderId: Math.floor(100000 + Math.random() * 900000),
+    });
+
+    setThankYou(true); // show thank-you message
+  };
+
+  const printChallan = () => window.print();
+
   return (
-    <div>
-      {/* Contact Info + Form */}
-      <section
+    <div
+      style={{
+        padding: "50px 20px",
+        maxWidth: "750px",
+        margin: "0 auto",
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      <h1 style={{ color: "#ff7b00", textAlign: "center", marginBottom: "30px" }}>
+        Contact & Order Form
+      </h1>
+
+      <form
+        onSubmit={calculateBill}
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "40px",
-          maxWidth: "1200px",
-          margin: "50px auto",
-          padding: "0 20px",
+          background: "#fff",
+          padding: "30px",
+          borderRadius: "10px",
+          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
         }}
       >
-        {/* Contact Information */}
-        <div
-          style={{
-            flex: "1 1 400px",
-            backgroundColor: "#f5f5f5",
-            padding: "30px",
-            borderRadius: "10px",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2 style={{ color: "#ff7b00", marginBottom: "20px" }}>Our Contact Info</h2>
-          <p><strong>Address:</strong> 123 TastyBite Street, Food City, Country</p>
-          <p><strong>Phone:</strong> +123 456 7890</p>
-          <p><strong>Email:</strong> info@tastybite.com</p>
-          <p><strong>Opening Hours:</strong> Mon-Sun: 10:00 AM - 11:00 PM</p>
-        </div>
+        <label>Name:</label>
+        <input
+          type="text"
+          required
+          value={order.name}
+          onChange={(e) => setOrder({ ...order, name: e.target.value })}
+          style={{ width: "100%", margin: "8px 0 15px", padding: "8px" }}
+        />
 
-        {/* Contact Form */}
-        <div
+        <label>Email:</label>
+        <input
+          type="email"
+          required
+          value={order.email}
+          onChange={(e) => setOrder({ ...order, email: e.target.value })}
+          style={{ width: "100%", margin: "8px 0 15px", padding: "8px" }}
+        />
+
+        <label>Phone:</label>
+        <input
+          type="tel"
+          required
+          value={order.phone}
+          onChange={(e) => setOrder({ ...order, phone: e.target.value })}
+          style={{ width: "100%", margin: "8px 0 15px", padding: "8px" }}
+        />
+
+        <label>Message:</label>
+        <textarea
+          rows="3"
+          value={order.message}
+          onChange={(e) => setOrder({ ...order, message: e.target.value })}
+          placeholder="Your message or special instructions..."
+          style={{ width: "100%", margin: "8px 0 20px", padding: "8px" }}
+        />
+
+        <h3 style={{ color: "#ff7b00" }}>Order Details</h3>
+
+        {selectedItems.map((item, index) => (
+          <div key={index} style={{ marginBottom: "20px" }}>
+            <label>Dish:</label>
+            <select
+              value={item.dish}
+              required
+              onChange={(e) => handleDishChange(index, "dish", e.target.value)}
+              style={{ width: "100%", margin: "8px 0", padding: "8px" }}
+            >
+              <option value="">Select Dish</option>
+              {Object.keys(menuItems).map((dish) => (
+                <option key={dish} value={dish}>
+                  {dish} - Rs. {menuItems[dish]}
+                </option>
+              ))}
+            </select>
+
+            <label>Quantity:</label>
+            <input
+              type="number"
+              min="1"
+              value={item.quantity}
+              onChange={(e) => handleDishChange(index, "quantity", e.target.value)}
+              style={{ width: "100%", margin: "8px 0", padding: "8px" }}
+            />
+
+            {selectedItems.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeDish(index)}
+                style={{
+                  background: "#ff4d4d",
+                  color: "#fff",
+                  border: "none",
+                  padding: "5px 10px",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={addDish}
           style={{
-            flex: "1 1 500px",
-            backgroundColor: "#f5f5f5",
-            padding: "30px",
-            borderRadius: "10px",
-            boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+            background: "#007bff",
+            color: "#fff",
+            border: "none",
+            padding: "8px 15px",
+            borderRadius: "5px",
+            marginBottom: "20px",
+            cursor: "pointer",
           }}
         >
-          <h2 style={{ color: "#ff7b00", marginBottom: "20px" }}>Send Us a Message</h2>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            style={{ display: "flex", flexDirection: "column", gap: "15px" }}
-          >
-            <input
-              type="text"
-              placeholder="Full Name"
-              {...register("name", { required: true })}
-              style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              {...register("email", { required: true })}
-              style={{ padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
-            />
-            <textarea
-              placeholder="Your Message"
-              {...register("message", { required: true })}
-              style={{
-                padding: "10px",
-                borderRadius: "5px",
-                border: "1px solid #ccc",
-                minHeight: "120px",
-              }}
-            />
+          + Add Another Dish
+        </button>
+
+        <button
+          type="submit"
+          style={{
+            background: "#ff7b00",
+            color: "#fff",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Generate Bill
+        </button>
+      </form>
+
+      {/* ✅ Thank You Message */}
+      {thankYou && (
+        <div
+          style={{
+            marginTop: "25px",
+            padding: "15px",
+            background: "#d4edda",
+            color: "#155724",
+            borderRadius: "8px",
+            textAlign: "center",
+            border: "1px solid #c3e6cb",
+            fontWeight: "500",
+          }}
+        >
+          🎉 Thank you for your order! Your delicious meal is being prepared. 🍽️
+        </div>
+      )}
+
+      {bill && (
+        <div
+          style={{
+            background: "#f8f8f8",
+            marginTop: "40px",
+            padding: "30px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+          }}
+        >
+          <h2 style={{ color: "#ff7b00", textAlign: "center" }}>TastyBite Restaurant</h2>
+          <p style={{ textAlign: "center", color: "#555" }}>Order Challan</p>
+          <hr />
+
+          <p><strong>Order ID:</strong> {bill.orderId}</p>
+          <p><strong>Date:</strong> {bill.date}</p>
+          <p><strong>Name:</strong> {bill.name}</p>
+          <p><strong>Email:</strong> {bill.email}</p>
+          <p><strong>Phone:</strong> {bill.phone}</p>
+
+          <h3 style={{ color: "#ff7b00" }}>Ordered Items:</h3>
+          <ul>
+            {bill.items.map((item, i) => (
+              <li key={i}>
+                {item.dish} ({item.quantity} × Rs.{item.price}) = Rs.{item.itemTotal}
+              </li>
+            ))}
+          </ul>
+
+          <h3 style={{ color: "#ff7b00" }}>Total Bill: Rs. {bill.total}</h3>
+
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
             <button
-              type="submit"
+              onClick={printChallan}
               style={{
-                backgroundColor: "#ff7b00",
-                color: "white",
-                padding: "12px",
-                border: "none",
+                background: "#555",
+                color: "#fff",
+                padding: "8px 15px",
                 borderRadius: "5px",
+                border: "none",
                 cursor: "pointer",
-                fontSize: "1rem",
               }}
             >
-              Send Message
+              Print Challan
             </button>
-          </form>
+          </div>
         </div>
-      </section>
-
-      {/* Map Section */}
-      <section style={{ marginTop: "50px", width: "100%", height: "400px" }}>
-        <iframe
-          title="TastyBite Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.086876249729!2d-122.41941548468152!3d37.77492977975902!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085808f74b51207%3A0x7f02b1c51f6c3d44!2sRestaurant!5e0!3m2!1sen!2sus!4v1600000000000!5m2!1sen!2sus"
-          width="100%"
-          height="100%"
-          style={{ border: 0, borderRadius: "10px" }}
-          allowFullScreen=""
-          loading="lazy"
-        ></iframe>
-      </section>
+      )}
     </div>
   );
 };

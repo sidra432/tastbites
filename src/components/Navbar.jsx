@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const logoUrl =
-    "src/assets/project images/logo.jpg"; // 🍽️ Restaurant logo
+    "src/assets/project images/logo 2.png"; // 🍽️ Restaurant logo
 
   return (
     <header
@@ -26,8 +26,8 @@ const Navbar = () => {
           src={logoUrl}
           alt="Restaurant Logo"
           style={{
-            height: "50px",
-            width: "50px",
+            height: "70px",
+            width: "70px",
             borderRadius: "50%",
             objectFit: "cover",
           }}

@@ -139,7 +139,7 @@ const Home = () => {
                 <h3 style={{ marginBottom: "10px", color: "#555" }}>{dish.name}</h3>
                 <p style={{ color: "#ff7b00", fontWeight: "bold" }}>Rs. {dish.price} PKR</p>
                 <Link
-                  to="/reservation"
+                  to="/contact"
                   style={{
                     display: "inline-block",
                     marginTop: "10px",
